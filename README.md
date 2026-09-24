@@ -9,7 +9,7 @@ Small fixes for other modules. Each patch can be turned on or off in the module 
 In Foundry: **Add-on Modules → Install Module**, paste this link into **Manifest URL** at the bottom, and click **Install**:
 
 ```
-https://github.com/Dxcufgb/dxcufgbs-patches/releases/latest/download/module.json
+https://github.com/dxcufgb/FoundryVTT-Module-patches/releases/latest/download/module.json
 ```
 
 ## Features
