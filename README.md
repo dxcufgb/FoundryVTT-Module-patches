@@ -24,14 +24,6 @@ Small fixes for other modules. Each patch has its own on/off setting.
 
 Every patch can be turned on or off under **Configure Settings → Dxcufgb's patches** (per user; needs a reload). A patch for another module only runs when that module is active.
 
-## Releasing a new version (maintainer notes)
-
-1. Commit and push your changes.
-2. On GitHub, open **Releases → Draft a new release**, create a new tag such as `v1.0.1`, and click **Publish release**.
-3. The **Release module** GitHub Action sets the version from the tag, fills in the download links, builds `module.zip`, and attaches `module.json` and `module.zip` to the release.
-
-Foundry installs and updates from the latest release, so users get the new version the next time they check for updates.
-
 ## License
 
 [MIT](LICENSE)
