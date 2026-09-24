@@ -1,0 +1,10 @@
+{
+  "DXP": {
+    "Settings": {
+      "PopoutCopy": {
+        "Name": "PopOut!: allow copying text in popped-out windows",
+        "Hint": "Lets Ctrl+C / Ctrl+X copy selected text in PopOut! windows. Without this, Foundry's 'copy tokens' shortcut swallows the key press."
+      }
+    }
+  }
+}
