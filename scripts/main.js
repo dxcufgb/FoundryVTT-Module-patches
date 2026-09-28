@@ -4,11 +4,15 @@
  */
 
 import * as popoutCopy from "./patches/popout-copy.js";
+import * as popoutRollDialogs from "./patches/popout-roll-dialogs.js";
 
 export const MODULE_ID = "dxcufgbs-patches";
 
-/** All patches. Each has: key (setting name), module (id of patched module or null), apply(). */
-const PATCHES = [popoutCopy];
+/**
+ * All patches. Each has: key (on/off setting), module (id of patched module or null), apply(),
+ * and optionally settings: [{ key, type, default }] for extra options shown under it.
+ */
+const PATCHES = [popoutCopy, popoutRollDialogs];
 
 Hooks.once("init", () => {
   for (const patch of PATCHES) {
@@ -21,6 +25,16 @@ Hooks.once("init", () => {
       default: true,
       requiresReload: true
     });
+    for (const extra of patch.settings ?? []) {
+      game.settings.register(MODULE_ID, extra.key, {
+        name: `DXP.Settings.${extra.key}.Name`,
+        hint: `DXP.Settings.${extra.key}.Hint`,
+        scope: "client",
+        config: true,
+        type: extra.type ?? Boolean,
+        default: extra.default ?? true
+      });
+    }
   }
 });
 

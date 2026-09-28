@@ -4,6 +4,18 @@
       "PopoutCopy": {
         "Name": "PopOut!: allow copying text in popped-out windows",
         "Hint": "Lets Ctrl+C / Ctrl+X copy selected text in PopOut! windows. Without this, Foundry's 'copy tokens' shortcut swallows the key press."
+      },
+      "PopoutRollDialogs": {
+        "Name": "PopOut!: show roll dialogs in the main window",
+        "Hint": "Roll dialogs (attacks, damage, checks, saves, skills, manual dice entry) opened from a popped-out sheet appear in the main Foundry window instead of the sheet's separate window."
+      },
+      "PopoutRollDialogsUsage": {
+        "Name": "PopOut!: also item and spell usage dialogs",
+        "Hint": "Also keep the dialogs for using an item or casting a spell (e.g. choosing a spell slot) in the main window."
+      },
+      "PopoutRollDialogsFocus": {
+        "Name": "PopOut!: bring the main window to the front",
+        "Hint": "When such a dialog opens, switch to the main Foundry window so you see it straight away."
       }
     }
   }
