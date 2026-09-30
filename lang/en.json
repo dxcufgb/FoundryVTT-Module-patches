@@ -16,6 +16,18 @@
       "PopoutRollDialogsFocus": {
         "Name": "PopOut!: bring the main window to the front",
         "Hint": "When such a dialog opens, switch to the main Foundry window so you see it straight away."
+      },
+      "MonksTokenbarPosition": {
+        "Name": "Monk's TokenBar: remember the token bar position",
+        "Hint": "Puts the token bar back where you left it after a reload, sizes it to fit its tokens, and stops it getting stuck in the middle of the screen (until minimized and restored). The position is saved per browser."
+      },
+      "MonksTokenbarPositionLock": {
+        "Name": "Monk's TokenBar: lock the token bar position",
+        "Hint": "Stops the token bar from being dragged away from its saved position. Turn off to move it, then turn back on. Monk's 'Reset Position' still works."
+      },
+      "MonksTokenbarPositionData": {
+        "Name": "Monk's TokenBar: saved position",
+        "Hint": ""
       }
     }
   }

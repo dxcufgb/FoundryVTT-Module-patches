@@ -35,6 +35,11 @@
         "id": "popout",
         "type": "module",
         "reason": "The PopOut! copy patch only does something when PopOut! is active."
+      },
+      {
+        "id": "monks-tokenbar",
+        "type": "module",
+        "reason": "The Monk's TokenBar position patch only does something when Monk's TokenBar is active."
       }
     ]
   }
