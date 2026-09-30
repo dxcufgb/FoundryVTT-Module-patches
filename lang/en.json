@@ -28,6 +28,10 @@
       "MonksTokenbarPositionData": {
         "Name": "Monk's TokenBar: saved position",
         "Hint": ""
+      },
+      "MonksTokenbarFade": {
+        "Name": "Monk's TokenBar: let a faded token bar reach the screen edges",
+        "Hint": "With Monk's 'Allow Fade' on, Foundry's fade styling stops the token bar from being dragged to the edge of the screen. This keeps the fade but undoes the layout changes. Does nothing when 'Allow Fade' is off."
       }
     }
   }
