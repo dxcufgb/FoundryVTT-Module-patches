@@ -12,8 +12,8 @@
  *
  * Fix:
  *   After each render of the token bar (and after restoring it from minimized, or
- *   collapsing/expanding it) let Foundry size it to its content ("auto") and move it
- *   to the saved position. Every move is saved in a client setting (per browser, so
+ *   collapsing/expanding it) measure the size its content needs, give Foundry that
+ *   size and move the bar to the saved position. Every move is saved in a client setting (per browser, so
  *   different screens can have different positions); Monk's own user flag is used as
  *   a fallback. Optionally the position can be locked. Monk's "Reset Position" menu
  *   also clears the saved position.
@@ -55,13 +55,25 @@ function isTokenBar(app) {
   return app?.id === APP_ID && app.constructor?.name === "TokenBar";
 }
 
+/**
+ * The size the bar takes up when nothing limits it: fixed width/height removed and
+ * moved to the left edge, so the tokens don't wrap or get cut off by the screen edge.
+ */
+function naturalSize(el) {
+  const { width, height, left } = el.style;
+  Object.assign(el.style, { width: "", height: "", left: "0px" });
+  const size = { width: el.offsetWidth, height: el.offsetHeight };
+  Object.assign(el.style, { width, height, left });
+  return size.width > 0 && size.height > 0 ? size : {};
+}
+
 /** Size the bar to its content and put it where it was saved. */
 function place(app) {
   const state = app?._dxpPosition;
-  if (!state || !app.rendered || app.minimized) return;
+  if (!state || !app.rendered || app.minimized || !app.element) return;
   state.restoring = true;
   try {
-    app.setPosition({ width: "auto", height: "auto", ...(state.pos ?? {}) });
+    app.setPosition({ ...naturalSize(app.element), ...(state.pos ?? {}) });
   } catch (err) {
     console.error(`${MODULE_ID} | ${key}`, err);
   } finally {
@@ -117,7 +129,7 @@ function onResetPosition() {
   state.pos = null;
   state.restoring = true;
   try {
-    app.setPosition({ width: "auto", height: "auto", left: undefined, top: undefined });   // Foundry centers it
+    app.setPosition({ ...naturalSize(app.element), left: undefined, top: undefined });   // Foundry centers it
   } finally {
     state.restoring = false;
   }
