@@ -2,7 +2,7 @@
 # Applies the shared GitHub settings to a dxcufgb/FoundryVTT-… module repository.
 # Idempotent: re-run it to fix drift or to set up a new module repository.
 #
-#   .github/repo-settings/apply.sh <owner/repo> [--description "…"] [--topic dnd5e]…
+#   .github/repo-settings/apply.sh <owner/repo> [--description "…"] [--topic dnd5e]… [--ruleset file.json]
 #
 # What it sets:
 #   - squash merge only (title = commit or PR title, body = commit messages), auto-merge on,
@@ -11,7 +11,8 @@
 #   - the "accessibility" label
 #   - secret scanning + push protection, Dependabot alerts + security updates,
 #     private vulnerability reporting, CodeQL default setup
-#   - the "Protect main" ruleset from ruleset-protect-main.json next to this script
+#   - the "Protect main" ruleset from ruleset-protect-main.json next to this script, or from
+#     --ruleset (e.g. a repository whose required checks are not "Check module")
 #     (PR with 1 approval, "Check module" must pass, squash only, no force push or deletion,
 #     admins may bypass through a pull request)
 # Rulesets, secret scanning, vulnerability reporting and CodeQL need a public repository
@@ -23,14 +24,18 @@ set -uo pipefail
 FULL="${1:?usage: apply.sh <owner/repo> [--description text] [--topic name]...}"; shift
 DESCRIPTION=""
 TOPICS=(foundryvtt foundry-vtt foundry-vtt-module)
+RULESET=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --description) DESCRIPTION="$2"; shift 2 ;;
     --topic) TOPICS+=("$2"); shift 2 ;;
+    --ruleset) RULESET="$2"; shift 2 ;;
     *) echo "Unknown option: $1" >&2; exit 1 ;;
   esac
 done
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RULESET="${RULESET:-$DIR/ruleset-protect-main.json}"
+[[ -f "$RULESET" ]] || { echo "Ruleset file not found: $RULESET" >&2; exit 1; }
 failures=0
 step() { printf '  %-44s' "$1"; }
 ok() { echo "ok"; }
@@ -78,9 +83,9 @@ if [[ "$VISIBILITY" == "public" ]]; then
   EXISTING_IDS="$(gh api "repos/$FULL/rulesets" --jq '.[] | select(.name | ascii_downcase | startswith("protect")) | .id' 2>/dev/null)"
   FIRST="$(head -n1 <<<"$EXISTING_IDS")"
   if [[ -n "$FIRST" ]]; then
-    run gh api -X PUT "repos/$FULL/rulesets/$FIRST" --input "$DIR/ruleset-protect-main.json"
+    run gh api -X PUT "repos/$FULL/rulesets/$FIRST" --input "$RULESET"
   else
-    run gh api -X POST "repos/$FULL/rulesets" --input "$DIR/ruleset-protect-main.json"
+    run gh api -X POST "repos/$FULL/rulesets" --input "$RULESET"
   fi
 else
   for s in "secret scanning + push protection" "private vulnerability reporting" "CodeQL default setup" "ruleset 'Protect main'"; do
