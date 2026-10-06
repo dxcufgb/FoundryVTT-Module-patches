@@ -1,10 +1,10 @@
-# Checks every push and pull request:
+# Checks every push and pull request (required to pass before merging into main):
 #   - module.json is valid and points at files that exist
-#   - all scripts parse and the language files are valid JSON
-#   - the module imports with stubbed Foundry globals and every visible setting
-#     has its Name and Hint in lang/en.json
-#   - the release packaging (same steps as release.yml) still works
-# No dependencies to install; see .github/ci/check-module.mjs.
+#   - all scripts parse, language files are valid JSON, referenced templates exist
+#   - the module imports with stubbed Foundry globals, its init/setup hooks run, and every
+#     visible setting has its Name and Hint in lang/en.json
+#   - the release packaging (the same script release.yml runs) still works
+# No dependencies to install; see .github/ci/.
 
 name: CI
 
@@ -13,14 +13,22 @@ on:
     branches: ["**"]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   check:
     name: Check module
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
 
@@ -29,29 +37,6 @@ jobs:
 
       - name: Dry-run the release packaging
         run: |
-          set -euo pipefail
-          TAG="v0.0.0-ci"
-          VERSION="${TAG#v}"
-          REPO_URL="https://github.com/${GITHUB_REPOSITORY}"
-          jq \
-            --arg version  "$VERSION" \
-            --arg url      "$REPO_URL" \
-            --arg manifest "${REPO_URL}/releases/latest/download/module.json" \
-            --arg download "${REPO_URL}/releases/download/${TAG}/module.zip" \
-            '.version = $version | .url = $url | .manifest = $manifest | .download = $download
-             | .bugs = ($url + "/issues") | .readme = ($url + "#readme")' \
-            module.json > module.tmp.json
-          jq -e --arg v "$VERSION" '.version == $v' module.tmp.json >/dev/null
-          mv module.tmp.json module.json
-          zip -qr module.zip . \
-            -x ".git/*" ".github/*" ".gitignore" ".gitattributes" "module.zip" "*.tmp.json"
-          echo "Contents of module.zip:"
-          unzip -l module.zip
-          # Everything module.json references must be in the zip, and CI/git files must not.
-          zipinfo -1 module.zip > zip-contents.txt
-          for f in $(jq -r '[.esmodules[]?, .scripts[]?, .styles[]?, .languages[]?.path] | .[]' module.json) module.json; do
-            grep -qx "$f" zip-contents.txt || { echo "missing from module.zip: $f"; exit 1; }
-          done
-          if grep -qE '^\.git(hub)?/' zip-contents.txt; then echo ".git or .github ended up in module.zip"; exit 1; fi
+          bash .github/ci/package.sh v0.0.0-ci
           git checkout -- module.json
-          rm -f module.zip zip-contents.txt
+          rm -f module.zip
