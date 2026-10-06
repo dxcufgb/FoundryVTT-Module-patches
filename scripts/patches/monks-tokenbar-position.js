@@ -121,6 +121,21 @@ function patchInstance(app) {
     return setPosition.call(this, position);
   };
 
+  // Foundry clamps the bar to the screen with whatever size it measures at that moment and
+  // keeps the clamped left/top. A single too-wide measurement (e.g. while the token list is
+  // being replaced) therefore pins the bar to the left edge until the next fix-up. Always
+  // resolve left/top from the saved position instead, so it can't be lost or pulled in.
+  const updatePosition = app._updatePosition;
+  app._updatePosition = function (position) {
+    const result = updatePosition.call(this, position);
+    if (state.pos && !state.dragging && Number.isFinite(result.width)) {
+      const maxLeft = Math.max(document.documentElement.clientWidth - result.width * (result.scale ?? 1), 0);
+      result.left = Math.clamp(state.pos.left, 0, maxLeft);
+      result.top = Math.clamp(state.pos.top, 0, Math.max(document.documentElement.clientHeight - (Number.isFinite(result.height) ? result.height : 0), 0));
+    }
+    return result;
+  };
+
   const maximize = app.maximize;
   app.maximize = async function (...args) {
     const result = await maximize.apply(this, args);
@@ -150,7 +165,9 @@ function patchInstance(app) {
 function onRender(app) {
   if (!isTokenBar(app)) return;
   patchInstance(app);
-  // Wait for Foundry to finish its own positioning of this render.
+  // Fix it before the browser paints, then again once Foundry has finished its own
+  // positioning of this render.
+  place(app);
   setTimeout(() => place(app), 0);
 }
 
