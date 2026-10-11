@@ -7,7 +7,7 @@ Foundry VTT v13 module (`dxcufgbs-patches`) holding small fixes for other module
 - `scripts/patches/*.js`: one file per patch. Each exports `key`, `module` (id of the patched module, or `null`), `apply()`, and optionally `settings: [{ key, type, default, config }]`.
 - `lang/en.json`: `DXP.Settings.<key>.Name` / `.Hint` for every patch key and extra setting.
 - `module.json`: `relationships.recommends` lists the patched modules. The version is overwritten from the release tag.
-- `.github/workflows/release.yml`: builds `module.zip` when a GitHub Release is published.
+- `.github/workflows/ci.yml` / `release.yml`: thin callers of `dxcufgb/foundry-module-ci` (checks, packaging, release: Actions → Release module → Run workflow with the version); identical in every module.
 
 ## Adding a patch
 1. Create `scripts/patches/<name>.js` with the exports above.
