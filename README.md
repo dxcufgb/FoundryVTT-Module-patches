@@ -1,5 +1,11 @@
 # Dxcufgb's patches
 
+[![Foundry v13](https://img.shields.io/github/v/release/dxcufgb/FoundryVTT-Module-patches?label=Foundry%20v13&logo=foundryvirtualtabletop&color=ff6400)](https://github.com/dxcufgb/FoundryVTT-Module-patches/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/dxcufgb/FoundryVTT-Module-patches/module.zip?label=downloads&color=blue)](https://github.com/dxcufgb/FoundryVTT-Module-patches/releases)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-support-FF5E5B?logo=kofi&logoColor=white)](https://ko-fi.com/dxcufgb)\
+[![CI](https://img.shields.io/github/actions/workflow/status/dxcufgb/FoundryVTT-Module-patches/ci.yml?branch=main&label=CI)](https://github.com/dxcufgb/FoundryVTT-Module-patches/actions/workflows/ci.yml)
+[![License](https://img.shields.io/github/license/dxcufgb/FoundryVTT-Module-patches)](LICENSE)
+
 Small fixes for other modules. Each patch can be turned on or off in the module settings.
 
 **Foundry VTT:** v13
