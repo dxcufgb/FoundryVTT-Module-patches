@@ -10,10 +10,13 @@
  *   all of these, so they appear next to the sheet instead of in Foundry.
  *
  * Fix:
- *   Wrap handleChildDialog. For roll dialogs (and optionally item/spell usage
- *   dialogs) it returns "not handled", so PopOut! leaves the dialog where Foundry
- *   rendered it: the main window. Optionally the main window is brought to the
- *   front so the dialog is seen right away.
+ *   Wrap handleChildDialog. Roll dialogs (and optionally item/spell usage
+ *   dialogs) follow the window that was clicked last: PopOut! stamps each
+ *   popped-out window with its last click (_popout_last_click), and we stamp the
+ *   main window. If the main window was clicked last, return "not handled", so
+ *   PopOut! leaves the dialog where Foundry rendered it: the main window
+ *   (optionally brought to the front). If a popped-out window was clicked last,
+ *   PopOut! handles the dialog as usual and moves it next to the sheet.
  */
 
 import { MODULE_ID } from "../main.js";
@@ -58,6 +61,17 @@ function shouldStayInMain(app) {
   return false;
 }
 
+// Time of the last pointerdown in the main window.
+let mainClick = 0;
+
+// True if a popped-out window was clicked more recently than the main window.
+function clickedInPopout(pm) {
+  for (const state of pm?.poppedOut?.values?.() ?? []) {
+    if (!state?.window?.closed && state.window?._popout_last_click > mainClick) return true;
+  }
+  return false;
+}
+
 function bringMainWindowForward(app) {
   if (!game.settings.get(MODULE_ID, "PopoutRollDialogsFocus")) return;
   try {
@@ -77,7 +91,7 @@ export function apply() {
 
   const patched = function (app) {
     try {
-      if (shouldStayInMain(app)) {
+      if (shouldStayInMain(app) && !clickedInPopout(this)) {
         bringMainWindowForward(app);
         return false;             // not a child dialog: PopOut! leaves it in the main window
       }
@@ -88,6 +102,9 @@ export function apply() {
   };
   patched.__dxpRollDialogs = true;
   PM.prototype.handleChildDialog = patched;
+
+  // Capture phase, so sheets/canvas stopping propagation can't hide the click.
+  window.addEventListener("pointerdown", () => { mainClick = Date.now(); }, true);
 
   // In case PopOut! put an own-property copy on its instance.
   const inst = PM.singleton;
