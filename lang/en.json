@@ -6,16 +6,16 @@
         "Hint": "Lets Ctrl+C / Ctrl+X copy selected text in PopOut! windows. Without this, Foundry's 'copy tokens' shortcut swallows the key press."
       },
       "PopoutRollDialogs": {
-        "Name": "PopOut!: show roll dialogs in the main window",
-        "Hint": "Roll dialogs (attacks, damage, checks, saves, skills, manual dice entry) opened from a popped-out sheet appear in the main Foundry window instead of the sheet's separate window."
+        "Name": "PopOut!: show roll dialogs in the window you clicked",
+        "Hint": "Roll dialogs (attacks, damage, checks, saves, skills, manual dice entry) open in the window you clicked to start the roll: the main Foundry window, or a popped-out sheet's window. Without this, PopOut! moves them to the popped-out sheet even when you rolled from the main window."
       },
       "PopoutRollDialogsUsage": {
         "Name": "PopOut!: also item and spell usage dialogs",
-        "Hint": "Also keep the dialogs for using an item or casting a spell (e.g. choosing a spell slot) in the main window."
+        "Hint": "Also open the dialogs for using an item or casting a spell (e.g. choosing a spell slot) in the window you clicked."
       },
       "PopoutRollDialogsFocus": {
         "Name": "PopOut!: bring the main window to the front",
-        "Hint": "When such a dialog opens, switch to the main Foundry window so you see it straight away."
+        "Hint": "When such a dialog opens in the main Foundry window, switch to it so you see it straight away."
       },
       "MonksTokenbarPosition": {
         "Name": "Monk's TokenBar: remember the token bar position",
