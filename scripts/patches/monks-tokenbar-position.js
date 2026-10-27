@@ -13,7 +13,9 @@
  * Fix:
  *   After each render of the token bar (and after restoring it from minimized, or
  *   collapsing/expanding it) measure the size its content needs and, if the bar's
- *   size or position is off, give Foundry that size and the saved position. When the
+ *   size or position is off, give Foundry that size and the saved position. Every
+ *   setPosition of the bar ends with the saved left/top (kept on screen), whatever
+ *   Foundry or another module resolved, so only a drag moves it. When the
  *   bar is dragged by its header the new position is saved in a client setting (per
  *   browser, so different screens can have different positions); Monk's own user flag
  *   is used as a fallback. Optionally the position can be locked. Monk's "Reset Position" menu
@@ -98,6 +100,29 @@ function place(app) {
   state.ready = true;
 }
 
+/**
+ * Runs after every setPosition of the bar. Foundry (its clamping with a size measured
+ * mid-render, the "auto" size it applies at the end of each render) or another module may
+ * resolve a different left/top than the one asked for, and the bar then jumps until the next
+ * fix-up moves it back. Put it straight back at the saved position, kept on screen, so only a
+ * drag (or Monk's Reset Position) can move it. Written through `app.position` so Foundry's own
+ * stored position (used as the start of the next drag) agrees with what is shown.
+ */
+function keepSavedPosition(app) {
+  const state = app._dxpPosition, el = app.element;
+  if (!state?.pos || state.dragging || app.minimized || !el?.isConnected) return;
+  const { width, height } = el.getBoundingClientRect();
+  const { clientWidth, clientHeight } = document.documentElement;
+  const left = Math.clamp(state.pos.left, 0, Math.max(clientWidth - width, 0));
+  const top = Math.clamp(state.pos.top, 0, Math.max(clientHeight - height, 0));
+  if (Math.abs(app.position.left - left) < 0.5 && Math.abs(app.position.top - top) < 0.5) return;
+  // Reflect.set: Foundry's position proxy returns the value from its set trap, so a plain
+  // assignment of 0 would throw in strict mode. The value is stored either way.
+  Reflect.set(app.position, "left", left);
+  Reflect.set(app.position, "top", top);
+  Object.assign(el.style, { left: `${left}px`, top: `${top}px` });
+}
+
 /** Save where the bar is now (after the user dragged it), or snap back when locked. */
 function recordPosition(app) {
   const state = app._dxpPosition;
@@ -118,20 +143,11 @@ function patchInstance(app) {
     if (moving && !state.restoring && state.pos && game.settings.get(MODULE_ID, LOCK)) {
       position = { ...position, left: state.pos.left, top: state.pos.top };
     }
-    return setPosition.call(this, position);
-  };
-
-  // Foundry clamps the bar to the screen with whatever size it measures at that moment and
-  // keeps the clamped left/top. A single too-wide measurement (e.g. while the token list is
-  // being replaced) therefore pins the bar to the left edge until the next fix-up. Always
-  // resolve left/top from the saved position instead, so it can't be lost or pulled in.
-  const updatePosition = app._updatePosition;
-  app._updatePosition = function (position) {
-    const result = updatePosition.call(this, position);
-    if (state.pos && !state.dragging && Number.isFinite(result.width)) {
-      const maxLeft = Math.max(document.documentElement.clientWidth - result.width * (result.scale ?? 1), 0);
-      result.left = Math.clamp(state.pos.left, 0, maxLeft);
-      result.top = Math.clamp(state.pos.top, 0, Math.max(document.documentElement.clientHeight - (Number.isFinite(result.height) ? result.height : 0), 0));
+    const result = setPosition.call(this, position);
+    try {
+      keepSavedPosition(this);
+    } catch (err) {
+      console.error(`${MODULE_ID} | ${key}`, err);
     }
     return result;
   };
@@ -150,11 +166,15 @@ function patchInstance(app) {
     if (event.target.closest("button, a, input, [data-action]")) return;
     state.dragging = true;
   });
-  window.addEventListener("pointerup", () => {
+  // A drag can also end without a pointerup (pointercancel), which would otherwise leave
+  // the bar unguarded until the next drag. Capture phase, so nothing can stop it first.
+  const endDrag = () => {
     if (!state.dragging) return;
     state.dragging = false;
     setTimeout(() => recordPosition(app), 0);
-  });
+  };
+  window.addEventListener("pointerup", endDrag, true);
+  window.addEventListener("pointercancel", endDrag, true);
 
   // Monk's collapse button only toggles a CSS class; re-measure the bar afterwards.
   app.element?.addEventListener("click", event => {
