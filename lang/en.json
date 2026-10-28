@@ -17,6 +17,10 @@
         "Name": "PopOut!: bring the main window to the front",
         "Hint": "When such a dialog opens in the main Foundry window, switch to it so you see it straight away."
       },
+      "PopoutContextMenus": {
+        "Name": "PopOut!: show context menus in the window you right-clicked",
+        "Hint": "Right-click menus (e.g. for items, spells and effects on a dnd5e sheet) open in the popped-out window you right-clicked. Without this, they open in the main Foundry window."
+      },
       "MonksTokenbarPosition": {
         "Name": "Monk's TokenBar: remember the token bar position",
         "Hint": "Puts the token bar back where you left it after a reload, sizes it to fit its tokens, and stops it getting stuck in the middle of the screen (until minimized and restored). The position is saved per browser."
