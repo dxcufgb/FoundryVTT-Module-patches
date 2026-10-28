@@ -5,6 +5,7 @@
 
 import * as popoutCopy from "./patches/popout-copy.js";
 import * as popoutRollDialogs from "./patches/popout-roll-dialogs.js";
+import * as popoutContextMenus from "./patches/popout-context-menus.js";
 import * as monksTokenbarPosition from "./patches/monks-tokenbar-position.js";
 import * as monksTokenbarFade from "./patches/monks-tokenbar-fade.js";
 import * as rulerMove from "./patches/ruler-move.js";
@@ -16,7 +17,7 @@ export const MODULE_ID = "dxcufgbs-patches";
  * and optionally settings: [{ key, type, default, config }] for extra options shown under it
  * (config: false keeps a setting out of the menu, e.g. stored data).
  */
-const PATCHES = [popoutCopy, popoutRollDialogs, monksTokenbarPosition, monksTokenbarFade, rulerMove];
+const PATCHES = [popoutCopy, popoutRollDialogs, popoutContextMenus, monksTokenbarPosition, monksTokenbarFade, rulerMove];
 
 Hooks.once("init", () => {
   for (const patch of PATCHES) {

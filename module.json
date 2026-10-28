@@ -34,7 +34,7 @@
       {
         "id": "popout",
         "type": "module",
-        "reason": "The PopOut! copy patch only does something when PopOut! is active."
+        "reason": "The PopOut! patches only do something when PopOut! is active."
       },
       {
         "id": "monks-tokenbar",
