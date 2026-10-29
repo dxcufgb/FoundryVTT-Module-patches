@@ -39,7 +39,7 @@
       {
         "id": "monks-tokenbar",
         "type": "module",
-        "reason": "The Monk's TokenBar position patch only does something when Monk's TokenBar is active."
+        "reason": "The Monk's TokenBar patches only do something when Monk's TokenBar is active."
       }
     ]
   }
