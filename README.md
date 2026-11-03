@@ -30,10 +30,6 @@ The full guide is in the [wiki](https://github.com/dxcufgb/FoundryVTT-Module-pat
 - [Settings](https://github.com/dxcufgb/FoundryVTT-Module-patches/wiki/Settings): every patch and option, with defaults
 - [For Module Authors](https://github.com/dxcufgb/FoundryVTT-Module-patches/wiki/For-Module-Authors): the methods each patch replaces
 
-## Releasing
-
-For the maintainer: **Actions → Release module → Run workflow**, type the version (for example `1.2.3`) and run it. The module is checked and packaged first; only then is the release `v1.2.3` published with `module.json` and `module.zip`. CI and releases come from [dxcufgb/foundry-module-ci](https://github.com/dxcufgb/foundry-module-ci), the same for every module.
-
 ## License
 
 [MIT](LICENSE)
