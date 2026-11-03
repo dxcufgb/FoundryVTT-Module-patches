@@ -14,7 +14,7 @@ Foundry VTT v13 module (`dxcufgbs-patches`) holding small fixes for other module
 2. Import it and add it to `PATCHES` in `scripts/main.js`.
 3. Add its `Name`/`Hint` strings to `lang/en.json` (also for each extra setting).
 4. Add the patched module to `recommends` in `module.json` if it isn't there.
-5. Add a row to the Features table in `README.md`.
+5. Add the patch to the wiki's Patches page (and its option to the Settings page).
 
 ## Conventions
 - A patch must never break Foundry if the target module changes: guard lookups of the other module's classes/methods and fail soft (`main.js` already catches errors from `apply()`).
@@ -36,4 +36,4 @@ Work on a descriptively named feature branch and open a PR to `main` (history us
 - **Hot paths**: the `keydown` listener (capture phase) and the `_processKeyboardContext` wrapper run on every key press, and the token bar hooks run on every token change. Return early and cheaply; layout measurement (`naturalSize`, `readStyles`) stays limited to the token bar element.
 - **Import cycle**: the patch files import `MODULE_ID` from `main.js`, which imports them. Use `MODULE_ID` only inside functions, never at the top level of a patch file (it is not yet initialised while the patches load).
 - **CI** (via `dxcufgb/foundry-module-ci`, `node scripts/check-module.mjs`): the exported `MODULE_ID` must equal `id` in `module.json`, and every visible setting needs `DXP.Settings.<key>.Name`/`.Hint` in `lang/en.json`. `.github/workflows/ci.yml` and `release.yml` are thin callers of `dxcufgb/foundry-module-ci`, identical in every module: do not edit them here (only Dependabot's bump of the pinned SHA), make the change in foundry-module-ci.
-- A new patch needs every step of "Adding a patch" above: the `PATCHES` entry, the `lang/en.json` strings, the `recommends` entry and the README row.
+- A new patch needs every step of "Adding a patch" above: the `PATCHES` entry, the `lang/en.json` strings, the `recommends` entry and the wiki's Patches page.
