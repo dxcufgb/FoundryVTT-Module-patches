@@ -18,6 +18,8 @@
  *   key tracking is kept) so the browser copies the text normally.
  */
 
+import { crumb } from "../debug-recorder.js";
+
 export const key = "PopoutCopy";
 export const module = "popout";
 
@@ -48,6 +50,7 @@ export function apply() {
   const patched = function (context, options) {
     if (isTextCopyInOtherWindow(context)) {
       // Keep key tracking consistent, but don't run keybindings or cancel the event.
+      crumb("popoutCopy.passThrough");
       this.downKeys?.add(context.key);
       return;
     }

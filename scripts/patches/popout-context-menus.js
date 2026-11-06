@@ -20,6 +20,7 @@
  */
 
 import { MODULE_ID } from "../main.js";
+import { crumb, noteError } from "../debug-recorder.js";
 
 export const key = "PopoutContextMenus";
 export const module = "popout";
@@ -58,6 +59,7 @@ function closeOnOutsideClick(contextMenu, menu, doc) {
       contextMenu.close?.();
     } catch (err) {
       console.error(`${MODULE_ID} | PopoutContextMenus`, err);
+      noteError(key);
     }
   };
   doc.addEventListener("pointerdown", onPointerDown, true);
@@ -70,6 +72,7 @@ function moveToPopout(contextMenu, menu, target) {
   doc.body.append(doc.adoptNode(menu));
   keepInside(menu, doc);
   closeOnOutsideClick(contextMenu, menu, doc);
+  crumb("popoutContextMenus.move");
 }
 
 export function apply() {
@@ -86,6 +89,7 @@ export function apply() {
         moveToPopout(this, menu, target);
       } catch (err) {
         console.error(`${MODULE_ID} | PopoutContextMenus`, err);
+        noteError(key);
       }
     };
     move();
