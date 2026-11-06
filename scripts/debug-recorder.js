@@ -55,12 +55,14 @@ function snapshot() {
   }
 }
 
-/** Register with the recorder once, whichever of its ready hook or the fallback comes first. */
+/**
+ * Register with the recorder once, whichever of its ready hook or the fallback comes first. The recorder is only
+ * kept when register() succeeds (it returns false on failure), so the fallback on "ready" can try again.
+ */
 function connect(rec) {
   if (recorder || typeof rec?.register !== "function") return;
-  recorder = rec;
   try {
-    rec.register(MODULE_ID, { snapshot });
+    if (rec.register(MODULE_ID, { snapshot }) !== false) recorder = rec;
   } catch (err) {
     console.warn(`${MODULE_ID} | debug recorder registration failed`, err);
   }
