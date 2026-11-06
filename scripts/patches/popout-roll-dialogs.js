@@ -20,6 +20,7 @@
  */
 
 import { MODULE_ID } from "../main.js";
+import { crumb, noteError } from "../debug-recorder.js";
 
 export const key = "PopoutRollDialogs";
 export const module = "popout";
@@ -93,10 +94,12 @@ export function apply() {
     try {
       if (shouldStayInMain(app) && !clickedInPopout(this)) {
         bringMainWindowForward(app);
+        crumb("popoutRollDialogs.keepInMain");
         return false;             // not a child dialog: PopOut! leaves it in the main window
       }
     } catch (err) {
       console.error(`${MODULE_ID} | PopoutRollDialogs`, err);
+      noteError(key);
     }
     return original.call(this, app);
   };

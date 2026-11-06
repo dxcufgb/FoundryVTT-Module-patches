@@ -14,6 +14,8 @@
  *   then end the measurement. Otherwise Space keeps its normal behaviour.
  */
 
+import { crumb, noteError } from "../debug-recorder.js";
+
 export const key = "RulerMove";
 export const module = null;
 
@@ -35,6 +37,7 @@ function onKeyDown(event) {
   event.preventDefault();
   event.stopImmediatePropagation();
   if (game.paused && !game.user.isGM) {
+    crumb("rulerMove.paused");
     ui.notifications.warn("GAME.PausedWarning", { localize: true });
     return;
   }
@@ -47,8 +50,12 @@ function onKeyDown(event) {
     const point = { x: x + dx, y: y + dy };
     return event.shiftKey ? point : token.getSnappedPosition(point);
   });
+  crumb("rulerMove.move", { waypoints: waypoints.length, snapped: !event.shiftKey });
   token.document.move(waypoints, { method: "dragging", constrainOptions: token._getDragConstrainOptions?.() })
-    .catch(err => console.error("dxcufgbs-patches | RulerMove: move failed", err));
+    .catch(err => {
+      console.error("dxcufgbs-patches | RulerMove: move failed", err);
+      noteError(key);
+    });
 
   // End the measurement the way a plain left click does.
   const mim = canvas.mouseInteractionManager;

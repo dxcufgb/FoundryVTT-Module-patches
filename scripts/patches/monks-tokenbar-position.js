@@ -23,6 +23,7 @@
  */
 
 import { MODULE_ID } from "../main.js";
+import { crumb, noteError } from "../debug-recorder.js";
 
 export const key = "MonksTokenbarPosition";
 export const module = "monks-tokenbar";
@@ -93,6 +94,7 @@ function place(app) {
       app.setPosition(wanted);
     } catch (err) {
       console.error(`${MODULE_ID} | ${key}`, err);
+      noteError(key);
     } finally {
       state.restoring = false;
     }
@@ -128,7 +130,11 @@ function recordPosition(app) {
   const state = app._dxpPosition;
   const { left, top } = app.position ?? {};
   if (!isPos({ left, top }) || app.minimized) return;
-  if (state.pos && game.settings.get(MODULE_ID, LOCK)) return place(app);
+  if (state.pos && game.settings.get(MODULE_ID, LOCK)) {
+    crumb("tokenbarPosition.lockSnapBack");
+    return place(app);
+  }
+  crumb("tokenbarPosition.save", { hadPosition: !!state.pos });
   state.pos = { left, top };
   storePosition(state.pos);
 }
@@ -136,6 +142,7 @@ function recordPosition(app) {
 function patchInstance(app) {
   if (app._dxpPosition) return;
   const state = app._dxpPosition = { pos: savedPosition(), restoring: false, ready: false, dragging: false };
+  crumb("tokenbarPosition.patchInstance", { hasSavedPosition: !!state.pos });
 
   const setPosition = app.setPosition;
   app.setPosition = function (position = {}) {
@@ -148,6 +155,7 @@ function patchInstance(app) {
       keepSavedPosition(this);
     } catch (err) {
       console.error(`${MODULE_ID} | ${key}`, err);
+      noteError(key);
     }
     return result;
   };
@@ -193,6 +201,7 @@ function onRender(app) {
 
 function onResetPosition() {
   storePosition(null, 0);
+  crumb("tokenbarPosition.reset");
   const app = foundry.applications.instances.get(APP_ID);
   const state = app?._dxpPosition;
   if (!state) return;

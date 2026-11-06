@@ -17,6 +17,7 @@
  */
 
 import { MODULE_ID } from "../main.js";
+import { crumb, noteError } from "../debug-recorder.js";
 
 export const key = "MonksTokenbarFade";
 export const module = "monks-tokenbar";
@@ -84,6 +85,7 @@ function fixFadedLayout(app) {
     }
   });
 
+  crumb("tokenbarFade.fix", { changed: changed.length });
   if (changed.length) console.log(`${MODULE_ID} | ${key}: undid faded-ui layout changes`, changed);
   else console.log(`${MODULE_ID} | ${key}: faded-ui did not change the token bar's layout`);
 
@@ -97,6 +99,7 @@ function onRender(app) {
     fixFadedLayout(app);
   } catch (err) {
     console.error(`${MODULE_ID} | ${key}`, err);
+    noteError(key);
   }
 }
 
